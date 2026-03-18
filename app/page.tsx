@@ -59,18 +59,15 @@ const helpText: Record<string, string> = {
     "Monthly buffer for repairs, replacements, restocking, and unexpected wear.",
   bookedNights:
     "Estimated booked nights per month based on your occupancy rate.",
-  grossRevenue:
-    "Revenue before most expenses are removed.",
-  platformFees:
-    "Estimated amount lost to booking platform fees.",
+  grossRevenue: "Revenue before most expenses are removed.",
+  platformFees: "Estimated amount lost to booking platform fees.",
   startupPerMonth:
     "Your startup cost spread across the amortization period.",
   baseExpenses:
     "Recurring monthly operating costs before startup amortization is included.",
   adjustedExpenses:
     "Recurring monthly costs plus the monthly share of startup cost.",
-  baseNetProfit:
-    "Profit before startup amortization is included.",
+  baseNetProfit: "Profit before startup amortization is included.",
   adjustedNetProfit:
     "More realistic monthly profit after including startup cost amortization.",
   baseBreakEven:
@@ -228,41 +225,41 @@ export default function Home() {
   const comparisonSummary = useMemo(() => {
     const profitWinner =
       resultsA.adjustedNetProfit > resultsB.adjustedNetProfit
-        ? "Option A"
+        ? "Scenario A"
         : resultsB.adjustedNetProfit > resultsA.adjustedNetProfit
-          ? "Option B"
+          ? "Scenario B"
           : "Tie";
 
     const breakEvenWinner =
       resultsA.adjustedBreakEvenOccupancy < resultsB.adjustedBreakEvenOccupancy
-        ? "Option A"
+        ? "Scenario A"
         : resultsB.adjustedBreakEvenOccupancy <
             resultsA.adjustedBreakEvenOccupancy
-          ? "Option B"
+          ? "Scenario B"
           : "Tie";
 
     const saferOption =
       resultsA.adjustedNetProfit >= resultsB.adjustedNetProfit &&
       resultsA.adjustedBreakEvenOccupancy <=
         resultsB.adjustedBreakEvenOccupancy
-        ? "Option A"
+        ? "Scenario A"
         : resultsB.adjustedNetProfit >= resultsA.adjustedNetProfit &&
             resultsB.adjustedBreakEvenOccupancy <=
               resultsA.adjustedBreakEvenOccupancy
-          ? "Option B"
+          ? "Scenario B"
           : "Mixed";
 
     let summaryText = "";
 
-    if (saferOption === "Option A") {
+    if (saferOption === "Scenario A") {
       summaryText =
-        "Option A currently looks stronger overall after factoring in startup and reserve assumptions.";
-    } else if (saferOption === "Option B") {
+        "Scenario A currently looks stronger overall after factoring in startup and reserve assumptions.";
+    } else if (saferOption === "Scenario B") {
       summaryText =
-        "Option B currently looks stronger overall after factoring in startup and reserve assumptions.";
+        "Scenario B currently looks stronger overall after factoring in startup and reserve assumptions.";
     } else {
       summaryText =
-        "The comparison is mixed. One option may offer better adjusted profit, while the other may be safer on adjusted break-even occupancy.";
+        "The comparison is mixed. One scenario may offer better adjusted profit, while the other may be safer on adjusted break-even occupancy.";
     }
 
     return {
@@ -283,15 +280,17 @@ export default function Home() {
                 Phylix Tech
               </p>
               <h1 className="mt-3 text-4xl font-semibold tracking-tight text-white md:text-5xl">
-                StayCalc Compare
+                StayCalc
               </h1>
               <p className="mt-3 text-base text-slate-300 md:text-lg">
-                Compare short-term rental scenarios with a calmer, more realistic
-                view of profit, risk, and break-even pressure.
+                Clarity for short-term rental decisions.
               </p>
               <p className="mt-2 text-sm text-slate-400">
-                Your scenarios save automatically in this browser. Tap the
-                question marks for explanations.
+                Understand profit, risk, and break-even — before you commit.
+              </p>
+              <p className="mt-2 text-sm text-slate-500">
+                Results update instantly as you change inputs. Tap ? for quick
+                explanations.
               </p>
             </div>
 
@@ -299,14 +298,14 @@ export default function Home() {
               onClick={resetScenarios}
               className="rounded-2xl border border-[#cbb8ff]/30 bg-[#191f38] px-4 py-3 text-sm font-medium text-[#efeaff] transition hover:bg-[#222948]"
             >
-              Reset both options
+              Reset both scenarios
             </button>
           </div>
         </div>
 
         <div className="grid gap-8 xl:grid-cols-2">
           <ScenarioPanel
-            title="Option A"
+            title="Scenario A"
             data={scenarioA}
             setData={setScenarioA}
             results={resultsA}
@@ -317,7 +316,7 @@ export default function Home() {
           />
 
           <ScenarioPanel
-            title="Option B"
+            title="Scenario B"
             data={scenarioB}
             setData={setScenarioB}
             results={resultsB}
@@ -371,6 +370,15 @@ export default function Home() {
             </p>
           </div>
         </section>
+
+        <footer className="mt-8 rounded-3xl border border-white/10 bg-[#0d1326] px-6 py-5 text-sm text-slate-400">
+          <div className="flex flex-col gap-2 md:flex-row md:items-center md:justify-between">
+            <p>
+              Built by <span className="text-slate-200">Phylix Tech</span>
+            </p>
+            <p>Functional tools for real-world decisions.</p>
+          </div>
+        </footer>
       </div>
     </main>
   );
@@ -503,7 +511,10 @@ function ScenarioPanel({
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold text-white">Results</h3>
+          <div className="flex items-center justify-between">
+            <h3 className="text-lg font-semibold text-white">Results</h3>
+            <p className="text-xs text-slate-500">Updates instantly</p>
+          </div>
 
           <div className="mt-4 space-y-3">
             <ResultRow
