@@ -40,6 +40,53 @@ const defaultScenarioB: Scenario = {
   maintenanceReserve: 200,
 };
 
+const helpText: Record<string, string> = {
+  rent: "Your monthly rent or lease cost for the property.",
+  nightlyRate: "The average price you expect to charge per booked night.",
+  occupancyRate:
+    "The percentage of nights booked in a month. Example: 70 means about 21 nights out of 30.",
+  cleaningCost:
+    "Estimated monthly cleaning spend. You can include turnovers, laundry, or contractor cleaning.",
+  utilities:
+    "Monthly utilities such as electricity, water, internet, and similar recurring bills.",
+  platformFee:
+    "The percentage taken by the booking platform from your revenue.",
+  startupCost:
+    "One-time setup cost like furniture, decor, kitchenware, locks, and supplies.",
+  amortizationMonths:
+    "How many months you want to spread your startup cost across for planning.",
+  maintenanceReserve:
+    "Monthly buffer for repairs, replacements, restocking, and unexpected wear.",
+  bookedNights:
+    "Estimated booked nights per month based on your occupancy rate.",
+  grossRevenue:
+    "Revenue before most expenses are removed.",
+  platformFees:
+    "Estimated amount lost to booking platform fees.",
+  startupPerMonth:
+    "Your startup cost spread across the amortization period.",
+  baseExpenses:
+    "Recurring monthly operating costs before startup amortization is included.",
+  adjustedExpenses:
+    "Recurring monthly costs plus the monthly share of startup cost.",
+  baseNetProfit:
+    "Profit before startup amortization is included.",
+  adjustedNetProfit:
+    "More realistic monthly profit after including startup cost amortization.",
+  baseBreakEven:
+    "Minimum occupancy needed to avoid losing money before startup amortization.",
+  adjustedBreakEven:
+    "Minimum occupancy needed to avoid losing money after startup amortization.",
+  verdict:
+    "A simple interpretation based on adjusted profit and adjusted break-even occupancy.",
+  comparisonProfit:
+    "Which option currently produces higher adjusted monthly profit.",
+  comparisonBreakEven:
+    "Which option needs a lower adjusted occupancy rate to break even.",
+  comparisonSafer:
+    "Overall safer option based on adjusted profit and adjusted break-even occupancy.",
+};
+
 function safeNumber(value: number) {
   return Number.isFinite(value) ? value : 0;
 }
@@ -128,6 +175,7 @@ export default function Home() {
   const [scenarioA, setScenarioA] = useState<Scenario>(defaultScenarioA);
   const [scenarioB, setScenarioB] = useState<Scenario>(defaultScenarioB);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [openHelp, setOpenHelp] = useState<string | null>(null);
 
   useEffect(() => {
     try {
@@ -182,16 +230,16 @@ export default function Home() {
       resultsA.adjustedNetProfit > resultsB.adjustedNetProfit
         ? "Option A"
         : resultsB.adjustedNetProfit > resultsA.adjustedNetProfit
-        ? "Option B"
-        : "Tie";
+          ? "Option B"
+          : "Tie";
 
     const breakEvenWinner =
       resultsA.adjustedBreakEvenOccupancy < resultsB.adjustedBreakEvenOccupancy
         ? "Option A"
         : resultsB.adjustedBreakEvenOccupancy <
-          resultsA.adjustedBreakEvenOccupancy
-        ? "Option B"
-        : "Tie";
+            resultsA.adjustedBreakEvenOccupancy
+          ? "Option B"
+          : "Tie";
 
     const saferOption =
       resultsA.adjustedNetProfit >= resultsB.adjustedNetProfit &&
@@ -199,10 +247,10 @@ export default function Home() {
         resultsB.adjustedBreakEvenOccupancy
         ? "Option A"
         : resultsB.adjustedNetProfit >= resultsA.adjustedNetProfit &&
-          resultsB.adjustedBreakEvenOccupancy <=
-            resultsA.adjustedBreakEvenOccupancy
-        ? "Option B"
-        : "Mixed";
+            resultsB.adjustedBreakEvenOccupancy <=
+              resultsA.adjustedBreakEvenOccupancy
+          ? "Option B"
+          : "Mixed";
 
     let summaryText = "";
 
@@ -226,35 +274,34 @@ export default function Home() {
   }, [resultsA, resultsB]);
 
   return (
-    <main className="min-h-screen bg-slate-50 text-slate-900">
-      <div className="mx-auto max-w-7xl px-6 py-12">
-        <div className="mb-10 flex flex-col gap-4 md:flex-row md:items-end md:justify-between">
-          <div>
-            <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-500">
-              Phylix Tech
-            </p>
-            <h1 className="mt-2 text-4xl font-bold tracking-tight">
-              StayCalc Compare
-            </h1>
-            <p className="mt-3 text-lg text-slate-600">
-              Compare two short-term rental scenarios side by side
-            </p>
-            <p className="mt-1 text-sm text-slate-400">
-              For estimation only. Real results depend on market conditions,
-              regulations, building rules, lease restrictions, and actual setup
-              costs.
-            </p>
-            <p className="mt-2 text-sm text-slate-500">
-              Your scenarios now save automatically in this browser.
-            </p>
-          </div>
+    <main className="min-h-screen bg-[#0b1020] text-slate-100">
+      <div className="mx-auto max-w-7xl px-6 py-10">
+        <div className="mb-8 rounded-3xl border border-white/10 bg-gradient-to-br from-[#121933] via-[#10172c] to-[#17122a] p-6 shadow-2xl shadow-black/20">
+          <div className="flex flex-col gap-4 lg:flex-row lg:items-end lg:justify-between">
+            <div className="max-w-3xl">
+              <p className="text-xs font-medium uppercase tracking-[0.35em] text-[#b8b8ff]">
+                Phylix Tech
+              </p>
+              <h1 className="mt-3 text-4xl font-semibold tracking-tight text-white md:text-5xl">
+                StayCalc Compare
+              </h1>
+              <p className="mt-3 text-base text-slate-300 md:text-lg">
+                Compare short-term rental scenarios with a calmer, more realistic
+                view of profit, risk, and break-even pressure.
+              </p>
+              <p className="mt-2 text-sm text-slate-400">
+                Your scenarios save automatically in this browser. Tap the
+                question marks for explanations.
+              </p>
+            </div>
 
-          <button
-            onClick={resetScenarios}
-            className="rounded-xl border border-slate-300 bg-white px-4 py-3 text-sm font-medium text-slate-700 shadow-sm transition hover:bg-slate-100"
-          >
-            Reset both options
-          </button>
+            <button
+              onClick={resetScenarios}
+              className="rounded-2xl border border-[#cbb8ff]/30 bg-[#191f38] px-4 py-3 text-sm font-medium text-[#efeaff] transition hover:bg-[#222948]"
+            >
+              Reset both options
+            </button>
+          </div>
         </div>
 
         <div className="grid gap-8 xl:grid-cols-2">
@@ -265,6 +312,8 @@ export default function Home() {
             results={resultsA}
             currency={currency}
             percent={percent}
+            openHelp={openHelp}
+            setOpenHelp={setOpenHelp}
           />
 
           <ScenarioPanel
@@ -274,32 +323,50 @@ export default function Home() {
             results={resultsB}
             currency={currency}
             percent={percent}
+            openHelp={openHelp}
+            setOpenHelp={setOpenHelp}
           />
         </div>
 
-        <section className="mt-8 rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
-          <h2 className="text-2xl font-semibold text-slate-900">
-            Comparison Summary
-          </h2>
+        <section className="mt-8 rounded-3xl border border-white/10 bg-[#11172c] p-6 shadow-xl shadow-black/20">
+          <div className="flex items-center gap-2">
+            <h2 className="text-2xl font-semibold text-white">
+              Comparison Summary
+            </h2>
+            <HelpBadge
+              id="comparisonSafer"
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
+            />
+          </div>
 
           <div className="mt-6 grid gap-3 md:grid-cols-3">
             <ResultRow
               label="Higher Adjusted Profit"
               value={comparisonSummary.profitWinner}
+              helpId="comparisonProfit"
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
             />
             <ResultRow
               label="Lower Adjusted Break-even"
               value={comparisonSummary.breakEvenWinner}
+              helpId="comparisonBreakEven"
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
             />
             <ResultRow
               label="Safer Overall Option"
               value={comparisonSummary.saferOption}
+              helpId="comparisonSafer"
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
             />
           </div>
 
-          <div className="mt-6 rounded-xl border border-slate-200 bg-slate-50 p-5">
-            <p className="text-sm font-medium text-slate-500">Interpretation</p>
-            <p className="mt-2 text-base text-slate-700">
+          <div className="mt-6 rounded-2xl border border-white/10 bg-[#0d1326] p-5">
+            <p className="text-sm font-medium text-[#cbb8ff]">Interpretation</p>
+            <p className="mt-2 text-base text-slate-300">
               {comparisonSummary.summaryText}
             </p>
           </div>
@@ -316,6 +383,8 @@ function ScenarioPanel({
   results,
   currency,
   percent,
+  openHelp,
+  setOpenHelp,
 }: {
   title: string;
   data: Scenario;
@@ -323,118 +392,166 @@ function ScenarioPanel({
   results: ReturnType<typeof calculateScenario>;
   currency: (value: number) => string;
   percent: (value: number) => string;
+  openHelp: string | null;
+  setOpenHelp: React.Dispatch<React.SetStateAction<string | null>>;
 }) {
   return (
-    <section className="rounded-2xl border border-slate-200 bg-white p-6 shadow-sm">
+    <section className="rounded-3xl border border-white/10 bg-[#11172c] p-6 shadow-xl shadow-black/20">
       <div className="mb-6">
-        <p className="text-sm font-medium uppercase tracking-[0.2em] text-slate-400">
+        <p className="text-xs font-medium uppercase tracking-[0.35em] text-[#8ca2d8]">
           Scenario
         </p>
-        <h2 className="mt-2 text-2xl font-semibold text-slate-900">{title}</h2>
+        <h2 className="mt-2 text-2xl font-semibold text-white">{title}</h2>
       </div>
 
       <div className="grid gap-8 lg:grid-cols-2">
         <div>
-          <h3 className="text-lg font-semibold text-slate-900">Inputs</h3>
+          <h3 className="text-lg font-semibold text-white">Inputs</h3>
 
           <div className="mt-4 space-y-4">
             <Input
               label="Monthly Rent"
+              helpId="rent"
               value={data.rent}
               setValue={(value) =>
                 setData((prev) => ({ ...prev, rent: value }))
               }
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
             />
             <Input
               label="Nightly Rate"
+              helpId="nightlyRate"
               value={data.nightlyRate}
               setValue={(value) =>
                 setData((prev) => ({ ...prev, nightlyRate: value }))
               }
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
             />
             <Input
               label="Occupancy Rate (%)"
+              helpId="occupancyRate"
               value={data.occupancyRate}
               setValue={(value) =>
                 setData((prev) => ({ ...prev, occupancyRate: value }))
               }
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
             />
             <Input
               label="Cleaning Cost"
+              helpId="cleaningCost"
               value={data.cleaningCost}
               setValue={(value) =>
                 setData((prev) => ({ ...prev, cleaningCost: value }))
               }
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
             />
             <Input
               label="Utilities"
+              helpId="utilities"
               value={data.utilities}
               setValue={(value) =>
                 setData((prev) => ({ ...prev, utilities: value }))
               }
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
             />
             <Input
               label="Platform Fee (%)"
+              helpId="platformFee"
               value={data.platformFee}
               setValue={(value) =>
                 setData((prev) => ({ ...prev, platformFee: value }))
               }
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
             />
             <Input
               label="Startup Cost"
+              helpId="startupCost"
               value={data.startupCost}
               setValue={(value) =>
                 setData((prev) => ({ ...prev, startupCost: value }))
               }
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
             />
             <Input
               label="Amortization Months"
+              helpId="amortizationMonths"
               value={data.amortizationMonths}
               setValue={(value) =>
                 setData((prev) => ({ ...prev, amortizationMonths: value }))
               }
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
             />
             <Input
               label="Maintenance Reserve"
+              helpId="maintenanceReserve"
               value={data.maintenanceReserve}
               setValue={(value) =>
                 setData((prev) => ({ ...prev, maintenanceReserve: value }))
               }
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
             />
           </div>
         </div>
 
         <div>
-          <h3 className="text-lg font-semibold text-slate-900">Results</h3>
+          <h3 className="text-lg font-semibold text-white">Results</h3>
 
           <div className="mt-4 space-y-3">
             <ResultRow
               label="Booked Nights / Month"
               value={results.bookedNights.toFixed(1)}
+              helpId="bookedNights"
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
             />
             <ResultRow
               label="Gross Revenue"
               value={currency(results.grossRevenue)}
+              helpId="grossRevenue"
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
             />
             <ResultRow
               label="Platform Fees"
               value={currency(results.feeCost)}
+              helpId="platformFees"
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
             />
             <ResultRow
               label="Startup Cost / Month"
               value={currency(results.adjustedStartupCost)}
+              helpId="startupPerMonth"
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
             />
             <ResultRow
               label="Base Expenses"
               value={currency(results.totalExpenses)}
+              helpId="baseExpenses"
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
             />
             <ResultRow
               label="Adjusted Expenses"
               value={currency(results.adjustedTotalExpenses)}
+              helpId="adjustedExpenses"
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
             />
             <ResultRow
               label="Base Net Profit"
               value={currency(results.netProfit)}
+              helpId="baseNetProfit"
               highlight={
                 results.netProfit < 0
                   ? "red"
@@ -442,10 +559,13 @@ function ScenarioPanel({
                     ? "yellow"
                     : "green"
               }
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
             />
             <ResultRow
               label="Adjusted Net Profit"
               value={currency(results.adjustedNetProfit)}
+              helpId="adjustedNetProfit"
               highlight={
                 results.adjustedNetProfit < 0
                   ? "red"
@@ -453,23 +573,38 @@ function ScenarioPanel({
                     ? "yellow"
                     : "green"
               }
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
             />
             <ResultRow
               label="Base Break-even"
               value={percent(results.breakEvenOccupancy)}
+              helpId="baseBreakEven"
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
             />
             <ResultRow
               label="Adjusted Break-even"
               value={percent(results.adjustedBreakEvenOccupancy)}
+              helpId="adjustedBreakEven"
+              openHelp={openHelp}
+              setOpenHelp={setOpenHelp}
             />
           </div>
 
-          <div className="mt-6 rounded-xl border border-slate-200 bg-white p-5 shadow-sm">
-            <p className="text-sm font-medium text-slate-500">Verdict</p>
-            <p className="mt-1 text-2xl font-bold text-slate-900">
+          <div className="mt-6 rounded-2xl border border-white/10 bg-[#0d1326] p-5">
+            <div className="flex items-center gap-2">
+              <p className="text-sm font-medium text-[#cbb8ff]">Verdict</p>
+              <HelpBadge
+                id="verdict"
+                openHelp={openHelp}
+                setOpenHelp={setOpenHelp}
+              />
+            </div>
+            <p className="mt-1 text-2xl font-bold text-white">
               {results.verdict}
             </p>
-            <p className="mt-2 text-sm text-slate-600">{results.riskNote}</p>
+            <p className="mt-2 text-sm text-slate-300">{results.riskNote}</p>
           </div>
         </div>
       </div>
@@ -481,24 +616,44 @@ function Input({
   label,
   value,
   setValue,
+  helpId,
+  openHelp,
+  setOpenHelp,
 }: {
   label: string;
   value: number;
   setValue: (value: number) => void;
+  helpId: string;
+  openHelp: string | null;
+  setOpenHelp: React.Dispatch<React.SetStateAction<string | null>>;
 }) {
+  const isOpen = openHelp === helpId;
+
   return (
     <label className="block">
-      <span className="mb-2 block text-sm font-medium text-slate-700">
-        {label}
-      </span>
+      <div className="mb-2 flex items-center gap-2">
+        <span className="text-sm font-medium text-slate-200">{label}</span>
+        <HelpBadge
+          id={helpId}
+          openHelp={openHelp}
+          setOpenHelp={setOpenHelp}
+        />
+      </div>
+
       <input
         type="number"
         value={value}
         onChange={(e) =>
           setValue(e.target.value === "" ? 0 : Number(e.target.value))
         }
-        className="w-full rounded-xl border border-slate-300 bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-slate-500"
+        className="w-full rounded-2xl border border-white/10 bg-[#0b1020] px-4 py-3 text-slate-100 outline-none transition focus:border-[#cbb8ff]/60"
       />
+
+      {isOpen && (
+        <div className="mt-2 rounded-2xl border border-[#cbb8ff]/20 bg-[#171d33] px-4 py-3 text-sm text-slate-300">
+          {helpText[helpId]}
+        </div>
+      )}
     </label>
   );
 }
@@ -507,21 +662,71 @@ function ResultRow({
   label,
   value,
   highlight,
+  helpId,
+  openHelp,
+  setOpenHelp,
 }: {
   label: string;
   value: string;
   highlight?: Highlight;
+  helpId: string;
+  openHelp: string | null;
+  setOpenHelp: React.Dispatch<React.SetStateAction<string | null>>;
 }) {
-  let color = "text-slate-900";
+  let color = "text-slate-100";
 
-  if (highlight === "green") color = "text-green-600";
-  if (highlight === "yellow") color = "text-yellow-600";
-  if (highlight === "red") color = "text-red-600";
+  if (highlight === "green") color = "text-emerald-300";
+  if (highlight === "yellow") color = "text-amber-300";
+  if (highlight === "red") color = "text-rose-300";
+
+  const isOpen = openHelp === helpId;
 
   return (
-    <div className="flex items-center justify-between rounded-xl border border-slate-200 bg-slate-50 px-4 py-3">
-      <span className="text-sm text-slate-500">{label}</span>
-      <span className={`text-base font-semibold ${color}`}>{value}</span>
+    <div>
+      <div className="flex items-center justify-between rounded-2xl border border-white/10 bg-[#0d1326] px-4 py-3">
+        <div className="flex items-center gap-2">
+          <span className="text-sm text-slate-300">{label}</span>
+          <HelpBadge
+            id={helpId}
+            openHelp={openHelp}
+            setOpenHelp={setOpenHelp}
+          />
+        </div>
+        <span className={`text-base font-semibold ${color}`}>{value}</span>
+      </div>
+
+      {isOpen && (
+        <div className="mt-2 rounded-2xl border border-[#cbb8ff]/20 bg-[#171d33] px-4 py-3 text-sm text-slate-300">
+          {helpText[helpId]}
+        </div>
+      )}
     </div>
+  );
+}
+
+function HelpBadge({
+  id,
+  openHelp,
+  setOpenHelp,
+}: {
+  id: string;
+  openHelp: string | null;
+  setOpenHelp: React.Dispatch<React.SetStateAction<string | null>>;
+}) {
+  const active = openHelp === id;
+
+  return (
+    <button
+      type="button"
+      onClick={() => setOpenHelp(active ? null : id)}
+      className={`flex h-5 w-5 items-center justify-center rounded-full text-[11px] font-semibold transition ${
+        active
+          ? "bg-[#cbb8ff] text-[#0b1020]"
+          : "border border-white/15 bg-white/5 text-[#d9ccff] hover:bg-white/10"
+      }`}
+      aria-label={`Explain ${id}`}
+    >
+      ?
+    </button>
   );
 }
